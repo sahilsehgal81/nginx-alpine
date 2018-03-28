@@ -1,26 +1,103 @@
-version: 0.2
-
-phases:
-  pre_build:
-    commands:
-      - echo Logging in to Amazon ECR...
-      - aws --version
-      - $(aws ecr get-login --region $AWS_DEFAULT_REGION --no-include-email)
-      - REPOSITORY_URI=https://github.com/sahilsehgal81/nginx-alpine
-      - IMAGE_TAG=$(echo $CODEBUILD_RESOLVED_SOURCE_VERSION | cut -c 1-7)
-  build:
-    commands:
-      - echo Build started on `date`
-      - echo Building the Docker image...          
-      - docker build -t $REPOSITORY_URI:latest .
-      - docker tag $REPOSITORY_URI:latest $REPOSITORY_URI:$IMAGE_TAG
-  post_build:
-    commands:
-      - echo Build completed on `date`
-      - echo Pushing the Docker images...
-      - docker push $REPOSITORY_URI:latest
-      - docker push $REPOSITORY_URI:$IMAGE_TAG
-      - echo Writing image definitions file...
-      - printf '[{"name":"hello-world","imageUri":"%s"}]' $REPOSITORY_URI:$IMAGE_TAG > imagedefinitions.json
-artifacts:
-    files: imagedefinitions.json
+{
+  "executionRoleArn": "arn:aws:iam::755586615581:role/ecsTaskExecutionRole",
+  "containerDefinitions": [
+    {
+      "dnsSearchDomains": null,
+      "logConfiguration": {
+        "logDriver": "awslogs",
+        "options": {
+          "awslogs-group": "/ecs/first-run-task-definition",
+          "awslogs-region": "us-east-1",
+          "awslogs-stream-prefix": "ecs"
+        }
+      },
+      "entryPoint": [],
+      "portMappings": [
+        {
+          "hostPort": 80,
+          "protocol": "tcp",
+          "containerPort": 80
+        }
+      ],
+      "command": [],
+      "linuxParameters": null,
+      "cpu": 0,
+      "environment": [],
+      "ulimits": null,
+      "dnsServers": null,
+      "mountPoints": [],
+      "workingDirectory": null,
+      "dockerSecurityOptions": null,
+      "memory": null,
+      "memoryReservation": 300,
+      "volumesFrom": [],
+      "image": "nginx:alpine",
+      "disableNetworking": null,
+      "healthCheck": null,
+      "essential": true,
+      "links": [],
+      "hostname": null,
+      "extraHosts": null,
+      "user": null,
+      "readonlyRootFilesystem": null,
+      "dockerLabels": null,
+      "privileged": null,
+      "name": "custom"
+    }
+  ],
+  "placementConstraints": [],
+  "memory": "512",
+  "taskRoleArn": null,
+  "compatibilities": [
+    "EC2",
+    "FARGATE"
+  ],
+  "taskDefinitionArn": "arn:aws:ecs:us-east-1:755586615581:task-definition/first-run-task-definition:2",
+  "family": "first-run-task-definition",
+  "requiresAttributes": [
+    {
+      "targetId": null,
+      "targetType": null,
+      "value": null,
+      "name": "com.amazonaws.ecs.capability.docker-remote-api.1.18"
+    },
+    {
+      "targetId": null,
+      "targetType": null,
+      "value": null,
+      "name": "ecs.capability.task-eni"
+    },
+    {
+      "targetId": null,
+      "targetType": null,
+      "value": null,
+      "name": "ecs.capability.execution-role-awslogs"
+    },
+    {
+      "targetId": null,
+      "targetType": null,
+      "value": null,
+      "name": "com.amazonaws.ecs.capability.logging-driver.awslogs"
+    },
+    {
+      "targetId": null,
+      "targetType": null,
+      "value": null,
+      "name": "com.amazonaws.ecs.capability.docker-remote-api.1.21"
+    },
+    {
+      "targetId": null,
+      "targetType": null,
+      "value": null,
+      "name": "com.amazonaws.ecs.capability.docker-remote-api.1.19"
+    }
+  ],
+  "requiresCompatibilities": [
+    "FARGATE"
+  ],
+  "networkMode": "awsvpc",
+  "cpu": "256",
+  "revision": 2,
+  "status": "ACTIVE",
+  "volumes": []
+}
